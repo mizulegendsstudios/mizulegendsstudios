@@ -1,30 +1,158 @@
 {
-  "HOME": {
-    "items": ["Estructura Fractal", "Compatibilidad", "Seguridad"],
-    "desc": "Bienvenido al tutorial del Mizu Engine. Navega para aprender cómo funciona este estándar."
-  },
-  "ESTRUCTURA FRACTAL": {
-    "items": ["Tres Opciones", "Mas de Tres", "Calle sin Salida"],
-    "desc": "El motor organiza la información en ramas lógicas que crecen en profundidad Z."
-  },
-  "TRES OPCIONES": {
-    "items": ["Nodo A", "Nodo B", "Nodo C"],
-    "desc": "Ejemplo de balance visual ideal para SmartTV y móviles."
-  },
-  "MAS DE TRES": {
-    "items": ["Opción 1", "Opción 2", "Opción 3", "Opción 4", "Opción 5"],
-    "desc": "En este nivel (5 ítems), el motor activa el scroll vertical fluido para no saturar el Viewport."
-  },
-  "CALLE SIN SALIDA": {
-    "items": ["Perfil Terminal"],
-    "desc": "Nivel 5 alcanzado. El motor detecta que no hay más ramas y muestra el contenido final."
-  },
-  "COMPATIBILIDAD": {
-    "items": ["Consolas", "SmartTV", "Navegadores IA"],
-    "desc": "Diseñado para ser operado con D-Pad, voz o punteros tradicionales."
-  },
-  "SEGURIDAD": {
-    "items": ["AGPLv3", "Sanitizacion", "Privacidad"],
-    "desc": "Protección legal y técnica estructural para proyectos de alto rendimiento."
-  }
+    "engine_version": "2.3.0",
+    "site_name": "Mizu Legends Studios",
+    "domain": "mizulegendsstudios.pages.dev",
+    "author": "Moises Núñez Ibarra",
+    "last_update": "2026-04-26",
+    "navigation_tree": [
+        {
+            "category": "Mizu Research Nexus",
+            "items": [
+                {
+                    "name": "Mizu Suite",
+                    "sub_items": [
+                        "Mizu Board",
+                        "Mizu Map",
+                        "Mizu Chat",
+                        "Mizu Math",
+                        "Mizu News",
+                        "Mizu Weather",
+                        "Mizu Vector",
+                        "Mizu Voice",
+                        "Mizu Frontend"
+                    ]
+                },
+                {
+                    "name": "Mizu University"
+                },
+                {
+                    "name": "Web Parts"
+                },
+                {
+                    "name": "Game Parts"
+                },
+                {
+                    "name": "Blog"
+                },
+                {
+                    "name": "Legacy Js",
+                    "sub_items": [
+                        "Terminos y Condiciones",
+                        "Política de Privacidad",
+                        "Seguridad y Protección",
+                        "EULA",
+                        "Cookies",
+                        "Security Tips"
+                    ]
+                }
+            ]
+        },
+        {
+            "category": "Mizu Enterprise Suite",
+            "items": [
+                {
+                    "name": "Mizu Notes"
+                },
+                {
+                    "name": "Mizu Calendar"
+                },
+                {
+                    "name": "Mizu Calc"
+                },
+                {
+                    "name": "Mizu Coder"
+                },
+                {
+                    "name": "Mizu Keygen",
+                    "sub_items": [
+                        "Mizu Task"
+                    ]
+                },
+                {
+                    "name": "Mizu Speech App",
+                    "sub_items": [
+                        "Mizu Interpreter",
+                        "Mizu Converter",
+                        "Mizu Table",
+                        "Mizu QR",
+                        "Mizu AI",
+                        "Mizu OCR",
+                        "Mizu OCRx"
+                    ]
+                }
+            ]
+        },
+        {
+            "category": "Mizu Creative Workshop",
+            "items": [
+                {
+                    "name": "Mizu Play"
+                },
+                {
+                    "name": "Mizu Mix"
+                },
+                {
+                    "name": "Mizu Pixel"
+                },
+                {
+                    "name": "Mizu 3D"
+                },
+                {
+                    "name": "Mizu Emojis"
+                }
+            ]
+        },
+        {
+            "category": "Mizu Interactive Labs",
+            "items": [
+                {
+                    "name": "FinKinder 1"
+                },
+                {
+                    "name": "FinKinder 2"
+                },
+                {
+                    "name": "Ritmo Infinito"
+                },
+                {
+                    "name": "Fenix Chess",
+                    "sub_items": [
+                        "Offline Engine Chess",
+                        "Veces Por Tablas",
+                        "Spiders",
+                        "Moba Manager Simulator"
+                    ]
+                },
+                {
+                    "name": "PixelversoBETA",
+                    "sub_items": [
+                        "Teseracto"
+                    ]
+                }
+            ]
+        },
+        {
+            "category": "Mizu Websites",
+            "items": [
+                {
+                    "name": "Sastrería Los Abuelos"
+                },
+                {
+                    "name": "Furniture Store"
+                },
+                {
+                    "name": "Gatos Fundacion"
+                },
+                {
+                    "name": "Mizu Shop"
+                },
+                {
+                    "name": "Iglesia Adventista"
+                },
+                {
+                    "name": "Elevadores Nacional"
+                }
+            ]
+        }
+    ]
 }
