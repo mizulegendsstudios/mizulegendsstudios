@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donación Cancelada - Mizu Fractal Engine</title>
+    <style>
+        :root {
+            --hex-gold: #c8aa6e;
+            --bg-dark: #010a13;
+            --cancel-red: #ff5f5f;
+        }
+        body {
+            background: var(--bg-dark);
+            color: white;
+            font-family: "Inter", sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 95, 95, 0.3);
+            backdrop-filter: blur(15px);
+            max-width: 500px;
+        }
+        h1 { color: var(--cancel-red); letter-spacing: 2px; text-transform: uppercase; }
+        p { color: #f0e6d2; opacity: 0.7; }
+        .btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 30px;
+            border: 1px solid var(--hex-gold);
+            color: var(--hex-gold);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Proceso Cancelado</h1>
+        <p>La operación no se completó. No se ha realizado ningún cargo a tu cuenta.</p>
+        <p>Si tuviste algún inconveniente técnico con PayPal o Ko-fi, puedes intentarlo más tarde o contactarnos.</p>
+        <a href="/" class="btn">Regresar al Inicio</a>
+    </div>
+</body>
+</html>

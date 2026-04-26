@@ -1,0 +1,23 @@
+{
+  "name": "mizu-fractal-engine",
+  "version": "1.0.0",
+  "description": "Motor de navegación fractal optimizado para IA y SmartTV bajo estándar AGPLv3",
+  "main": "index.html",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tu-usuario/nombre-repo.git"
+  },
+  "keywords": [
+    "fractal",
+    "ia-standard",
+    "smart-tv",
+    "moba-wiki",
+    "mizu-legends"
+  ],
+  "author": "Moises Núñez",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/tu-usuario/nombre-repo/issues"
+  },
+  "homepage": "https://github.com/tu-usuario/nombre-repo#readme"
+}

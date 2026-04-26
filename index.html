@@ -1,0 +1,828 @@
+<!--
+/*
+ * =============================================================================
+ * MIZU FRACTAL ENGINE - Estándar de Navegación Fractal para la Web e IA
+ * Copyright (C) 2026 Moises Núñez / Mizu Legends Studios
+ * =============================================================================
+ * * Este programa es software libre: puedes redistribuirlo y/o modificarlo
+ * bajo los términos de la Licencia Pública General Afín de GNU (AGPL) 
+ * publicada por la Free Software Foundation, ya sea la versión 3 
+ * de la Licencia, o (a tu elección) cualquier versión posterior.
+ *
+ * Este programa se distribuye con la esperanza de que sea útil,
+ * pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de
+ * MERCANTILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Consulte la
+ * Licencia Pública General Afín de GNU para más detalles.
+ *
+ * Debería haber recibido una copia de la Licencia Pública General Afín de GNU 
+ * junto con este programa. Si no, vea <https://www.gnu.org/licenses/>.
+ *
+ * -----------------------------------------------------------------------------
+ * Módulo: engine.core.js (Versión 2.3.0)
+ * Rol: Interfaz de alta jerarquía, seguridad, accesibilidad y fluidez fractal.
+ * Contrato de Interfaz:
+ * • Jerarquía: Ramas dinámicas variables (1, 3, 5, n hijos o terminal).
+ * • Accesibilidad: Mapeo nativo de D-Pad/Flechas para SmartTV y Consolas.
+ * • URL State: Enrutamiento basado en hash (#/level1/level2) para Deep Linking.
+ * • Kinetic Flow: Transiciones en eje Z con desenfoque de movimiento optimizado.
+ * • UX: Feedback auditivo sintetizado para confirmación de acciones.
+ * -----------------------------------------------------------------------------
+ * @author Moises Núñez (@mizulegends)
+ * @version 2.3.0 - Edición "Illustrator Pastel"
+ * =============================================================================
+ -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Mizu Engine · Navegación Universal + Controles</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* TEMAS (5 estilos) */
+        body {
+            transition: background 0.2s, color 0.2s;
+            font-family: system-ui, 'Segoe UI', 'Inter', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        body[data-theme="esports"] {
+            --hex-gold: #f0b34b;
+            --hex-blue: #2ad4c4;
+            --bg-dark: #06121c;
+            --glass: rgba(255,255,255,0.05);
+            --text-light: #eef4ff;
+            --card-bg: radial-gradient(ellipse at 50% 30%, rgba(42,212,196,0.12), #071a24);
+            --border-glow: rgba(240,179,75,0.4);
+        }
+        body[data-theme="neon"] {
+            --hex-gold: #ff3d6c;
+            --hex-blue: #0afff0;
+            --bg-dark: #0a0a1f;
+            --glass: rgba(10,255,240,0.05);
+            --text-light: #f0f0ff;
+            --card-bg: radial-gradient(ellipse at 50% 30%, rgba(255,61,108,0.15), #04041a);
+            --border-glow: #ff3d6c80;
+        }
+        body[data-theme="retro"] {
+            --hex-gold: #bfff40;
+            --hex-blue: #3eff9e;
+            --bg-dark: #142010;
+            --glass: rgba(63,255,158,0.05);
+            --text-light: #d4ffb0;
+            --card-bg: radial-gradient(ellipse at 50% 30%, rgba(191,255,64,0.1), #0a1a0a);
+            --border-glow: #bfff4060;
+        }
+        body[data-theme="oceanic"] {
+            --hex-gold: #7ef9ff;
+            --hex-blue: #00c2ff;
+            --bg-dark: #051e2c;
+            --glass: rgba(0,194,255,0.05);
+            --text-light: #dafaff;
+            --card-bg: radial-gradient(ellipse at 50% 30%, rgba(126,249,255,0.1), #02121f);
+            --border-glow: #7ef9ff70;
+        }
+        body[data-theme="sunset"] {
+            --hex-gold: #ffb86b;
+            --hex-blue: #ff6b8b;
+            --bg-dark: #2a111a;
+            --glass: rgba(255,107,139,0.05);
+            --text-light: #ffe6e6;
+            --card-bg: radial-gradient(ellipse at 50% 30%, rgba(255,184,107,0.12), #200b14);
+            --border-glow: #ffb86b80;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-light);
+        }
+
+        .hud-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(16px);
+            z-index: 1100;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border-glow);
+        }
+        .crumb {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--border-glow);
+            padding: 5px 14px;
+            border-radius: 40px;
+            color: var(--hex-gold);
+            cursor: pointer;
+            transition: 0.2s;
+            outline: none;
+        }
+        .crumb:focus-visible {
+            outline: 2px solid var(--hex-blue);
+            background: var(--hex-blue);
+            color: var(--bg-dark);
+            transform: scale(1.02);
+        }
+        .crumb:hover {
+            background: var(--hex-blue);
+            color: var(--bg-dark);
+        }
+
+        #stage {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .node {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-glow);
+            cursor: pointer;
+            outline: none;
+            padding: 1.8rem;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .node:focus-visible {
+            outline: 3px solid var(--hex-blue);
+            background: rgba(42,212,196,0.15);
+            transform: scale(1.01);
+        }
+        .node:hover {
+            background: radial-gradient(ellipse at 50% 30%, rgba(200,170,110,0.15), rgba(0,0,0,0.6));
+        }
+
+        @media (orientation: landscape) {
+            #stage {
+                scroll-snap-type: y mandatory;
+            }
+            .node {
+                min-height: 100vh;
+                scroll-snap-align: start;
+                padding: 2rem 3rem;
+            }
+        }
+        @media (orientation: portrait) {
+            .node {
+                min-height: 33vh;
+                padding: 1rem;
+            }
+            .node h2 {
+                font-size: 1.4rem !important;
+            }
+            .node-detail {
+                display: none;
+            }
+        }
+
+        .node-tag {
+            font-size: 0.7rem;
+            color: var(--hex-blue);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            padding: 4px 14px;
+            border-radius: 60px;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+        .node h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #fff, var(--hex-gold));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin: 16px 0;
+            max-width: 90vw;
+        }
+        .node-detail {
+            max-width: 620px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            background: rgba(0,0,0,0.5);
+            padding: 12px 20px;
+            border-radius: 40px;
+            border: 0.5px solid var(--border-glow);
+            margin-top: 14px;
+            white-space: pre-line;
+        }
+
+        .zoom-forward {
+            transform: scale(0.94) translateY(18px);
+            opacity: 0;
+            filter: blur(10px);
+            transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .spawn-in {
+            animation: smoothPop 0.45s cubic-bezier(0.15, 0.85, 0.3, 1.05) forwards;
+        }
+        @keyframes smoothPop {
+            0% { opacity: 0; transform: translateY(24px) scale(0.96); filter: blur(12px);}
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0);}
+        }
+
+        .floating-buttons {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            gap: 12px;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        .float-btn {
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--hex-gold);
+            border-radius: 60px;
+            padding: 10px 20px;
+            font-weight: bold;
+            color: var(--hex-gold);
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            font-family: monospace;
+            outline: none;
+        }
+        .float-btn:focus-visible {
+            outline: 3px solid var(--hex-blue);
+            transform: scale(1.05);
+            background: var(--hex-blue);
+            color: var(--bg-dark);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-card {
+            background: var(--bg-dark);
+            border: 1px solid var(--hex-gold);
+            border-radius: 32px;
+            max-width: 420px;
+            width: 85%;
+            padding: 28px;
+            text-align: center;
+        }
+        .modal-card button {
+            background: transparent;
+            border: 1px solid var(--hex-blue);
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: var(--hex-blue);
+            cursor: pointer;
+            margin-top: 16px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .modal-card button:focus-visible {
+            outline: 2px solid var(--hex-gold);
+            background: var(--hex-blue);
+            color: var(--bg-dark);
+        }
+        .cookie-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--hex-gold);
+            border-radius: 28px;
+            padding: 12px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            z-index: 2100;
+        }
+        .cookie-bar button {
+            background: transparent;
+            border: 1px solid var(--hex-blue);
+            padding: 6px 16px;
+            border-radius: 40px;
+            color: var(--hex-blue);
+            cursor: pointer;
+        }
+        .cookie-bar button:focus-visible {
+            outline: 2px solid var(--hex-gold);
+            background: var(--hex-blue);
+            color: var(--bg-dark);
+        }
+    </style>
+</head>
+<body data-theme="esports">
+
+<nav class="hud-nav" id="hud-nav"></nav>
+<div id="stage"></div>
+
+<div class="floating-buttons">
+    <div class="float-btn" id="themeBtn" tabindex="0">🎨 Cambiar tema</div>
+    <div class="float-btn" id="supportBtn" tabindex="0">❤️ Apoyar</div>
+</div>
+
+<div id="cookieBar" class="cookie-bar" style="display: none;">
+    <p>🍪 Usamos cookies técnicas para recordar tu tema. No datos personales.</p>
+    <div style="display: flex; gap: 10px;">
+        <button id="moreInfoBtn">ℹ️ Más info</button>
+        <button id="acceptCookiesBtn">Aceptar</button>
+    </div>
+</div>
+
+<div id="infoModal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card">
+        <h3 style="color: var(--hex-gold); margin-bottom: 12px;">Información</h3>
+        <p id="modalText"></p>
+        <div class="modal-buttons">
+            <button id="closeModalBtn">Entendido</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Audio Engine
+    const AudioEngine = {
+        ctx: null,
+        init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+        tic(freq = 800) {
+            if (!this.ctx) this.init();
+            if (this.ctx.state === 'suspended') this.ctx.resume().catch(()=>{});
+            try {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = "sine";
+                osc.frequency.value = freq;
+                gain.gain.value = 0.04;
+                gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.06);
+            } catch(e) {}
+        }
+    };
+
+    // ========== BASE DE DATOS ==========
+    const db = {
+        '🏠 INICIO': {
+            items: ['🎮 Controles / Ayuda', '🔷 Ejemplo: 3 opciones', '🚫 Callejón sin salida', '🌀 Dispersión (6 opciones)', '🐙 Profundidad infinita'],
+            desc: 'Centro de navegación universal. Usa ↑↓ para moverte entre opciones, ←→ en el navbar. ↑ en primer nodo va al navbar, ↓ en último nodo a botones.'
+        },
+        '🎮 Controles / Ayuda': {
+            items: ['⌨️ Teclado', '🎮 Mando (Gamepad)', '📺 Smart TV / Control Remoto', '🖱️ Ratón / Táctil'],
+            desc: 'Selecciona tu dispositivo para ver comandos.'
+        },
+        '⌨️ Teclado': { items: [], desc: '↑↓: mover nodos | Enter: seleccionar | ESC/Back: retroceder | ←→: navbar | ↑ en primer nodo: navbar | ↓ en último nodo: botones' },
+        '🎮 Mando (Gamepad)': { items: [], desc: 'D-pad ↑↓: nodos | A/Enter: seleccionar | B/Escape: atrás | ←→: navbar | Navegación fluida.' },
+        '📺 Smart TV / Control Remoto': { items: [], desc: 'Flechas direccionales (modo foco). OK: seleccionar. Volver: atrás. Si tienes "mouse virtual", desactívalo. El foco siempre recuperable con flechas.' },
+        '🖱️ Ratón / Táctil': { items: [], desc: 'Scroll suave, clic en nodos, clic en migas, botones flotantes.' },
+        '🔷 Ejemplo: 3 opciones': { items: ['Opción Alpha', 'Opción Beta', 'Opción Gamma'], desc: 'Tres ramas hijas.' },
+        'Opción Alpha': { items: [], desc: 'Dead end.' },
+        'Opción Beta': { items: [], desc: 'Dead end.' },
+        'Opción Gamma': { items: [], desc: 'Dead end.' },
+        '🚫 Callejón sin salida': { items: ['🌑 Sin salida', '🌒 Callejón oscuro'], desc: 'Dos hojas terminales.' },
+        '🌑 Sin salida': { items: [], desc: 'Dead end.' },
+        '🌒 Callejón oscuro': { items: [], desc: 'Dead end.' },
+        '🌀 Dispersión (6 opciones)': { items: ['Item #1','Item #2','Item #3','Item #4','Item #5','Item #6'], desc: '6 opciones.' },
+        'Item #1': { items: [], desc: 'Terminal' }, 'Item #2': { items: [], desc: 'Terminal' }, 'Item #3': { items: [], desc: 'Terminal' },
+        'Item #4': { items: [], desc: 'Terminal' }, 'Item #5': { items: [], desc: 'Terminal' }, 'Item #6': { items: [], desc: 'Terminal' },
+        '🐙 Profundidad infinita': { items: ['Profundidad_N1'], desc: 'Profundidad infinita.' }
+    };
+
+    function getDynamicDepth(itemName) {
+        const match = itemName.match(/^Profundidad_N(\d+)$/);
+        if (match) {
+            const level = parseInt(match[1], 10);
+            return { items: [`Profundidad_N${level+1}`], desc: `🐙 Nivel ${level} — sigue bajando.` };
+        }
+        return null;
+    }
+
+    let historyStack = ['🏠 INICIO'];
+    let lastFocusedNode = null;
+
+    function updateURL() { window.location.hash = historyStack.map(encodeURIComponent).join('/'); }
+
+    function render(currentNode) {
+        const stageEl = document.getElementById('stage');
+        const oldNodes = document.querySelectorAll('.node');
+        oldNodes.forEach(n => n.classList.add('zoom-forward'));
+        setTimeout(() => {
+            stageEl.innerHTML = '';
+            let data = null;
+            const dynamic = getDynamicDepth(currentNode);
+            if (dynamic) data = dynamic;
+            else if (db[currentNode]) data = { items: db[currentNode].items, desc: db[currentNode].desc };
+            else data = { items: [], desc: `📌 Nodo terminal.` };
+            const hasItems = data.items && data.items.length > 0;
+            if (!hasItems) {
+                const leaf = document.createElement('div');
+                leaf.className = 'node spawn-in';
+                leaf.tabIndex = 0;
+                leaf.innerHTML = `<div class="node-tag">🏁 DEAD END</div><h2>${escapeHtml(currentNode)}</h2><div class="node-detail">${escapeHtml(data.desc)}</div>`;
+                stageEl.appendChild(leaf);
+                attachNodeEvents(leaf);
+            } else {
+                data.items.forEach(childName => {
+                    const div = document.createElement('div');
+                    div.className = 'node spawn-in';
+                    div.tabIndex = 0;
+                    div.innerHTML = `<div class="node-tag">➡️ ${escapeHtml(currentNode)}</div><h2>${escapeHtml(childName)}</h2><div class="node-detail">${escapeHtml(getDynamicDesc(childName))}</div>`;
+                    div.onclick = (e) => { e.stopPropagation(); navigateToChild(childName); };
+                    attachNodeEvents(div);
+                    stageEl.appendChild(div);
+                });
+            }
+            updateHUD();
+            const firstNode = stageEl.querySelector('.node');
+            if (firstNode) {
+                firstNode.focus();
+                firstNode.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                lastFocusedNode = firstNode;
+            }
+        }, 260);
+    }
+
+    function navigateToChild(childName) {
+        AudioEngine.tic(1100);
+        historyStack.push(childName);
+        updateURL();
+        render(childName);
+    }
+
+    function attachNodeEvents(node) {
+        node.onkeydown = (e) => {
+            if (e.key === 'Enter') { node.click(); return; }
+            const nodes = Array.from(document.querySelectorAll('.node'));
+            const idx = nodes.indexOf(node);
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (idx === nodes.length - 1) {
+                    const themeBtn = document.getElementById('themeBtn');
+                    if (themeBtn) themeBtn.focus();
+                } else {
+                    const next = nodes[idx + 1];
+                    if (next) { next.focus(); next.scrollIntoView({ behavior: 'smooth', block: 'start' }); lastFocusedNode = next; }
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (idx === 0) {
+                    const firstCrumb = document.querySelector('.crumb');
+                    if (firstCrumb) firstCrumb.focus();
+                } else {
+                    const prev = nodes[idx - 1];
+                    if (prev) { prev.focus(); prev.scrollIntoView({ behavior: 'smooth', block: 'start' }); lastFocusedNode = prev; }
+                }
+            }
+        };
+        node.addEventListener('focus', () => { lastFocusedNode = node; });
+    }
+
+    function getDynamicDesc(name) {
+        if (db[name] && db[name].desc) return db[name].desc;
+        if (name.match(/^Profundidad_N\d+$/)) return `🐙 Profundidad dinámica. Sigue bajando.`;
+        return `Explora "${name}".`;
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+
+    function updateHUD() {
+        const nav = document.getElementById('hud-nav');
+        nav.innerHTML = '';
+        historyStack.forEach((crumb, idx) => {
+            const span = document.createElement('span');
+            span.className = 'crumb';
+            span.tabIndex = 0;
+            let display = crumb.length > 24 ? crumb.slice(0,20)+'…' : crumb;
+            span.innerText = display;
+            span.title = crumb;
+            span.onclick = () => {
+                if (idx === historyStack.length-1) return;
+                AudioEngine.tic(620);
+                historyStack = historyStack.slice(0, idx+1);
+                updateURL();
+                render(historyStack[historyStack.length-1]);
+            };
+            span.onkeydown = (e) => {
+                const crumbs = Array.from(document.querySelectorAll('.crumb'));
+                const currentIdx = crumbs.indexOf(span);
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    if (currentIdx > 0) crumbs[currentIdx-1].focus();
+                    else crumbs[crumbs.length-1].focus();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    if (currentIdx < crumbs.length-1) crumbs[currentIdx+1].focus();
+                    else crumbs[0].focus();
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (lastFocusedNode && document.body.contains(lastFocusedNode)) {
+                        lastFocusedNode.focus();
+                        lastFocusedNode.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else {
+                        const firstNode = document.querySelector('.node');
+                        if (firstNode) { firstNode.focus(); firstNode.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    span.click();
+                }
+            };
+            nav.appendChild(span);
+        });
+        if (nav.lastChild) nav.lastChild.scrollIntoView({ behavior: 'smooth', inline: 'end' });
+    }
+
+    function setupFloatingButtonsFocus() {
+        const themeBtn = document.getElementById('themeBtn');
+        const supportBtn = document.getElementById('supportBtn');
+        supportBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                const firstNode = document.querySelector('.node');
+                if (firstNode) { firstNode.focus(); firstNode.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                themeBtn.focus();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                supportBtn.click();
+            }
+        });
+        themeBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                supportBtn.focus();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                const nodes = document.querySelectorAll('.node');
+                if (nodes.length > 0) {
+                    nodes[nodes.length-1].focus();
+                    nodes[nodes.length-1].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                themeBtn.click();
+            }
+        });
+    }
+
+    // Gestión de foco perdido: cualquier flecha de dirección reenfoca el elemento más lógico
+    function setupGlobalFocusRecovery() {
+        window.addEventListener('keydown', (e) => {
+            if (e.key.startsWith('Arrow')) {
+                const active = document.activeElement;
+                const isBody = active === document.body || active === document.documentElement;
+                const isModal = document.querySelector('.modal-overlay.active');
+                if (isModal) return; // el modal maneja su foco
+                if (isBody || (active && active.classList && active.classList.contains('node') === false && 
+                    active.id !== 'themeBtn' && active.id !== 'supportBtn' && active.classList?.contains('crumb') === false)) {
+                    // foco perdido: intentar recuperar
+                    e.preventDefault();
+                    const firstNode = document.querySelector('.node');
+                    if (firstNode) {
+                        firstNode.focus();
+                        firstNode.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else {
+                        const firstCrumb = document.querySelector('.crumb');
+                        if (firstCrumb) firstCrumb.focus();
+                    }
+                }
+            }
+        });
+    }
+
+    // MODAL con focus automático
+    let previousActiveElement = null;
+    function openModal(modalId, customContent = null) {
+        const modal = document.getElementById(modalId);
+        const modalText = document.getElementById('modalText');
+        if (customContent) modalText.innerHTML = customContent;
+        previousActiveElement = document.activeElement;
+        modal.classList.add('active');
+        const closeBtn = document.getElementById('closeModalBtn');
+        if (closeBtn) closeBtn.focus();
+        const trap = (e) => {
+            const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            if (focusable.length === 0) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.key === 'Tab') {
+                if (e.shiftKey) {
+                    if (document.activeElement === first) {
+                        e.preventDefault();
+                        last.focus();
+                    }
+                } else {
+                    if (document.activeElement === last) {
+                        e.preventDefault();
+                        first.focus();
+                    }
+                }
+            }
+        };
+        modal.addEventListener('keydown', trap);
+        modal.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeModal(modalId);
+            }
+        }, { once: false });
+        modal._trapHandler = trap;
+    }
+
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.classList.remove('active');
+        if (modal._trapHandler) {
+            modal.removeEventListener('keydown', modal._trapHandler);
+            delete modal._trapHandler;
+        }
+        if (previousActiveElement && previousActiveElement.focus) previousActiveElement.focus();
+        else {
+            const firstNode = document.querySelector('.node');
+            if (firstNode) firstNode.focus();
+        }
+    }
+
+    // COOKIES: foco inicial en "Aceptar", navegación entre botones
+    function initCookies() {
+        const bar = document.getElementById('cookieBar');
+        const acceptBtn = document.getElementById('acceptCookiesBtn');
+        const moreBtn = document.getElementById('moreInfoBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        if (!localStorage.getItem('mizu_cookie_consent')) {
+            bar.style.display = 'flex';
+            // Enfocar el botón "Aceptar"
+            acceptBtn.focus();
+            // Navegación entre los dos botones con flechas izquierda/derecha
+            const buttons = [moreBtn, acceptBtn];
+            const handleKey = (e) => {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    if (document.activeElement === acceptBtn) moreBtn.focus();
+                    else if (document.activeElement === moreBtn) acceptBtn.focus();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    if (document.activeElement === moreBtn) acceptBtn.focus();
+                    else if (document.activeElement === acceptBtn) moreBtn.focus();
+                }
+            };
+            bar.addEventListener('keydown', handleKey);
+            acceptBtn.onclick = () => {
+                localStorage.setItem('mizu_cookie_consent', 'true');
+                bar.style.display = 'none';
+                AudioEngine.tic(420);
+                bar.removeEventListener('keydown', handleKey);
+                const firstNode = document.querySelector('.node');
+                if (firstNode) firstNode.focus();
+            };
+            moreBtn.onclick = () => {
+                openModal('infoModal', '🍪 Cookies técnicas: almacenan tu preferencia de tema y consentimiento. No hay rastreo.');
+                bar.removeEventListener('keydown', handleKey);
+            };
+        } else {
+            bar.style.display = 'none';
+            const firstNode = document.querySelector('.node');
+            if (firstNode) firstNode.focus();
+        }
+        closeModalBtn.onclick = () => {
+            closeModal('infoModal');
+        };
+    }
+
+    function setupSupportButton() {
+        const supportBtn = document.getElementById('supportBtn');
+        supportBtn.onclick = () => {
+            AudioEngine.tic(900);
+            window.open('https://www.paypal.com/donate/?hosted_button_id=CE4XEUSEYHQXL', '_blank', 'noopener,noreferrer');
+        };
+    }
+
+    // Temas
+    const themes = ['esports', 'neon', 'retro', 'oceanic', 'sunset'];
+    let currentThemeIndex = 0;
+    function applyTheme(idx) { document.body.setAttribute('data-theme', themes[idx]); localStorage.setItem('mizu_theme', themes[idx]); }
+    function cycleTheme() { currentThemeIndex = (currentThemeIndex+1)%themes.length; applyTheme(currentThemeIndex); AudioEngine.tic(880); }
+    function loadSavedTheme() {
+        const saved = localStorage.getItem('mizu_theme');
+        if(saved && themes.includes(saved)) { currentThemeIndex = themes.indexOf(saved); applyTheme(currentThemeIndex); }
+        else applyTheme(0);
+    }
+
+    function loadFromURL() {
+        let hash = window.location.hash.substring(1);
+        if(hash) {
+            const parts = hash.split('/').filter(p=>p.trim()!=='').map(decodeURIComponent);
+            if(parts.length) { historyStack = parts; render(historyStack[historyStack.length-1]); return; }
+        }
+        historyStack = ['🏠 INICIO'];
+        render('🏠 INICIO');
+    }
+
+    function attachScrollFocusSync() {
+        const stage = document.getElementById('stage');
+        let ticking = false;
+        stage.addEventListener('scroll', () => {
+            if(!ticking) {
+                requestAnimationFrame(() => {
+                    const nodes = document.querySelectorAll('.node');
+                    if(!nodes.length) return;
+                    let best = null, bestDist = Infinity;
+                    const viewMid = stage.scrollTop + stage.clientHeight/2;
+                    nodes.forEach(node => {
+                        const rect = node.getBoundingClientRect();
+                        const mid = rect.top + rect.height/2;
+                        const dist = Math.abs(mid - stage.clientHeight/2);
+                        if(dist < bestDist) { bestDist = dist; best = node; }
+                    });
+                    if(best && document.activeElement !== best) best.focus();
+                    if(best) lastFocusedNode = best;
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+    }
+
+    window.addEventListener('keydown', (e) => {
+        const modalActive = document.querySelector('.modal-overlay.active');
+        if (modalActive) return;
+        if(e.key === 'Escape' || e.key === 'Backspace') {
+            if(historyStack.length > 1) {
+                e.preventDefault();
+                AudioEngine.tic(550);
+                historyStack.pop();
+                updateURL();
+                render(historyStack[historyStack.length-1]);
+            }
+        }
+    });
+
+    window.onload = () => {
+        AudioEngine.init();
+        loadSavedTheme();
+        loadFromURL();
+        attachScrollFocusSync();
+        setupFloatingButtonsFocus();
+        setupSupportButton();
+        setupGlobalFocusRecovery();
+        document.getElementById('themeBtn').addEventListener('click', cycleTheme);
+        window.addEventListener('hashchange', loadFromURL);
+        // Inicializar cookies después de que el DOM tenga los nodos
+        setTimeout(() => initCookies(), 100);
+        const resumeAudio = () => {
+            if(AudioEngine.ctx && AudioEngine.ctx.state === 'suspended') AudioEngine.ctx.resume();
+            document.removeEventListener('click', resumeAudio);
+            document.removeEventListener('touchstart', resumeAudio);
+        };
+        document.addEventListener('click', resumeAudio);
+        document.addEventListener('touchstart', resumeAudio);
+    };
+</script>
+</body>
+</html>

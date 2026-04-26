@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Gracias por tu apoyo! - Mizu Fractal Engine</title>
+    <style>
+        :root {
+            --hex-gold: #c8aa6e;
+            --hex-gold-bright: #f0e6d2;
+            --bg-dark: #010a13;
+            --success-blue: #0ac8b9;
+        }
+        body {
+            background: var(--bg-dark);
+            color: white;
+            font-family: "Inter", sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            text-align: center;
+        }
+        .container {
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--hex-gold);
+            backdrop-filter: blur(20px);
+            max-width: 500px;
+            box-shadow: 0 0 50px rgba(10, 200, 185, 0.1);
+        }
+        h1 { color: var(--hex-gold); letter-spacing: 4px; text-transform: uppercase; }
+        p { color: var(--hex-gold-bright); line-height: 1.6; opacity: 0.8; }
+        .btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 30px;
+            border: 1px solid var(--success-blue);
+            color: var(--success-blue);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+        .btn:hover { background: rgba(10, 200, 185, 0.1); box-shadow: 0 0 20px rgba(10, 200, 185, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>¡Operación Exitosa!</h1>
+        <p>Tu contribución ha sido procesada correctamente. Gracias por invertir en el desarrollo del <strong>Mizu Fractal Engine</strong> y ayudarnos a estandarizar la web del futuro.</p>
+        <p style="font-size: 0.85rem; font-style: italic;">"El orden fractal es la base del dominio."</p>
+        <a href="/" class="btn">Volver al Nexo</a>
+    </div>
+</body>
+</html>

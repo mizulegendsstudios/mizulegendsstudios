@@ -1,0 +1,30 @@
+{
+  "HOME": {
+    "items": ["Estructura Fractal", "Compatibilidad", "Seguridad"],
+    "desc": "Bienvenido al tutorial del Mizu Engine. Navega para aprender cómo funciona este estándar."
+  },
+  "ESTRUCTURA FRACTAL": {
+    "items": ["Tres Opciones", "Mas de Tres", "Calle sin Salida"],
+    "desc": "El motor organiza la información en ramas lógicas que crecen en profundidad Z."
+  },
+  "TRES OPCIONES": {
+    "items": ["Nodo A", "Nodo B", "Nodo C"],
+    "desc": "Ejemplo de balance visual ideal para SmartTV y móviles."
+  },
+  "MAS DE TRES": {
+    "items": ["Opción 1", "Opción 2", "Opción 3", "Opción 4", "Opción 5"],
+    "desc": "En este nivel (5 ítems), el motor activa el scroll vertical fluido para no saturar el Viewport."
+  },
+  "CALLE SIN SALIDA": {
+    "items": ["Perfil Terminal"],
+    "desc": "Nivel 5 alcanzado. El motor detecta que no hay más ramas y muestra el contenido final."
+  },
+  "COMPATIBILIDAD": {
+    "items": ["Consolas", "SmartTV", "Navegadores IA"],
+    "desc": "Diseñado para ser operado con D-Pad, voz o punteros tradicionales."
+  },
+  "SEGURIDAD": {
+    "items": ["AGPLv3", "Sanitizacion", "Privacidad"],
+    "desc": "Protección legal y técnica estructural para proyectos de alto rendimiento."
+  }
+}
