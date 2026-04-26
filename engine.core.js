@@ -27,6 +27,40 @@ const MizuEngine = {
     currentThemeIndex: 0,
     themes: ['esports', 'neon', 'retro', 'oceanic', 'sunset'],
 
+    init() {
+        // Inicializar AudioContext
+        this.AudioEngine.init();
+        
+        // Cargar tema guardado
+        this.loadSavedTheme();
+        
+        // Cargar estado desde URL
+        this.loadFromURL();
+        
+        // Configurar eventos
+        this.attachScrollFocusSync();
+        this.setupFloatingButtonsFocus();
+        this.setupSupportButton();
+        this.setupGlobalFocusRecovery();
+        
+        // Configurar tema
+        document.getElementById('themeBtn').addEventListener('click', this.cycleTheme.bind(this));
+        window.addEventListener('hashchange', this.loadFromURL.bind(this));
+        
+        // Inicializar cookies
+        setTimeout(() => this.initCookies(), 100);
+        
+        // Configurar reproducción de audio
+        const resumeAudio = () => {
+            if(this.AudioEngine.ctx && this.AudioEngine.ctx.state === 'suspended') 
+                this.AudioEngine.ctx.resume();
+            document.removeEventListener('click', resumeAudio);
+            document.removeEventListener('touchstart', resumeAudio);
+        };
+        document.addEventListener('click', resumeAudio);
+        document.addEventListener('touchstart', resumeAudio);
+    },
+
     updateURL() { window.location.hash = this.historyStack.map(encodeURIComponent).join('/'); },
 
     render(currentNode) {
