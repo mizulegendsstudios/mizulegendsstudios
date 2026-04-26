@@ -2,7 +2,9 @@
 const MizuEngine = {
     AudioEngine: {
         ctx: null,
-        init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+        init() { 
+            if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); 
+        },
         tic(freq = 800) {
             if (!this.ctx) this.init();
             if (this.ctx.state === 'suspended') this.ctx.resume().catch(()=>{});
@@ -44,8 +46,8 @@ const MizuEngine = {
         this.setupGlobalFocusRecovery();
         
         // Configurar tema
-        document.getElementById('themeBtn').addEventListener('click', this.cycleTheme.bind(this));
-        window.addEventListener('hashchange', this.loadFromURL.bind(this));
+        document.getElementById('themeBtn').addEventListener('click', () => this.cycleTheme());
+        window.addEventListener('hashchange', () => this.loadFromURL());
         
         // Inicializar cookies
         setTimeout(() => this.initCookies(), 100);
@@ -61,7 +63,9 @@ const MizuEngine = {
         document.addEventListener('touchstart', resumeAudio);
     },
 
-    updateURL() { window.location.hash = this.historyStack.map(encodeURIComponent).join('/'); },
+    updateURL() { 
+        window.location.hash = this.historyStack.map(encodeURIComponent).join('/'); 
+    },
 
     render(currentNode) {
         const stageEl = document.getElementById('stage');
@@ -70,8 +74,11 @@ const MizuEngine = {
         setTimeout(() => {
             stageEl.innerHTML = '';
             let data = null;
-            if (this.db[currentNode]) data = { items: this.db[currentNode].items, desc: this.db[currentNode].desc };
-            else data = { items: [], desc: `📌 Nodo terminal.` };
+            if (this.db[currentNode]) {
+                data = { items: this.db[currentNode].items, desc: this.db[currentNode].desc };
+            } else {
+                data = { items: [], desc: `📌 Nodo terminal.` };
+            }
             const hasItems = data.items && data.items.length > 0;
             if (!hasItems) {
                 const leaf = document.createElement('div');
@@ -369,7 +376,11 @@ const MizuEngine = {
         let hash = window.location.hash.substring(1);
         if(hash) {
             const parts = hash.split('/').filter(p=>p.trim()!=='').map(decodeURIComponent);
-            if(parts.length) { this.historyStack = parts; this.render(this.historyStack[this.historyStack.length-1]); return; }
+            if(parts.length) { 
+                this.historyStack = parts; 
+                this.render(this.historyStack[this.historyStack.length-1]); 
+                return; 
+            }
         }
         this.historyStack = ['🏠 INICIO'];
         this.render('🏠 INICIO');
@@ -401,4 +412,5 @@ const MizuEngine = {
     }
 };
 
+// Asegurar que MizuEngine esté disponible globalmente
 window.MizuEngine = MizuEngine;
